@@ -23,8 +23,12 @@ export async function checkoutWithStripe(
   redirectPath: string = '/account'
 ): Promise<CheckoutResponse> {
   try {
+    if (!stripe) {
+      throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.');
+    }
+
     // Get the user from Supabase auth
-    const supabase = createClient();
+    const supabase = await createClient();
     const {
       error,
       data: { user }
@@ -121,7 +125,11 @@ export async function checkoutWithStripe(
 
 export async function createStripePortal(currentPath: string) {
   try {
-    const supabase = createClient();
+    if (!stripe) {
+      throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.');
+    }
+
+    const supabase = await createClient();
     const {
       error,
       data: { user }

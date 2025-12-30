@@ -3,12 +3,12 @@ import cn from 'classnames';
 
 import s from './Input.module.css';
 
-interface Props extends Omit<InputHTMLAttributes<any>, 'onChange'> {
+interface Props extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   className?: string;
   onChange: (value: string) => void;
 }
 const Input = (props: Props) => {
-  const { className, children, onChange, ...rest } = props;
+  const { className, onChange, ...rest } = props;
 
   const rootClassName = cn(s.root, {}, className);
 

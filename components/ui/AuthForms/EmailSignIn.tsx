@@ -10,16 +10,14 @@ import { useState } from 'react';
 // Define prop type with allowPassword boolean
 interface EmailSignInProps {
   allowPassword: boolean;
-  redirectMethod: string;
   disableButton?: boolean;
 }
 
 export default function EmailSignIn({
   allowPassword,
-  redirectMethod,
   disableButton
 }: EmailSignInProps) {
-  const router = redirectMethod === 'client' ? useRouter() : null;
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -69,7 +67,7 @@ export default function EmailSignIn({
           </p>
           <p>
             <Link href="/signin/signup" className="font-light text-sm">
-              Don't have an account? Sign up
+              Don&apos;t have an account? Sign up
             </Link>
           </p>
         </>

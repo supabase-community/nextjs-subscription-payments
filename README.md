@@ -1,9 +1,5 @@
 # Next.js Subscription Payments Starter
 
-
-> [!WARNING]  
-> This repo has been sunset and replaced by a new template: https://github.com/nextjs/saas-starter
-
 ## Features
 
 - Secure user management and authentication with [Supabase](https://supabase.io/docs/guides/auth)
@@ -29,7 +25,7 @@ When deploying this template, the sequence of steps is important. Follow the ste
 
 #### Vercel Deploy Button
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnextjs-subscription-payments&env=NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,STRIPE_SECRET_KEY&envDescription=Enter%20your%20Stripe%20API%20keys.&envLink=https%3A%2F%2Fdashboard.stripe.com%2Fapikeys&project-name=nextjs-subscription-payments&repository-name=nextjs-subscription-payments&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnextjs-subscription-payments%2Ftree%2Fmain)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase-community%2Fnextjs-subscription-payments&env=NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,STRIPE_SECRET_KEY&envDescription=Enter%20your%20Stripe%20API%20keys.&envLink=https%3A%2F%2Fdashboard.stripe.com%2Fapikeys&project-name=nextjs-subscription-payments&repository-name=nextjs-subscription-payments&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fsupabase-community%2Fnextjs-subscription-payments%2Ftree%2Fmain)
 
 The Vercel Deployment will create a new repository with this template on your GitHub account and guide you through a new Supabase project creation. The [Supabase Vercel Deploy Integration](https://vercel.com/integrations/supabase) will set up the necessary Supabase environment variables and run the [SQL migrations](./supabase/migrations/20230530034630_init.sql) to set up the Database schema on your account. You can inspect the created tables in your project's [Table editor](https://app.supabase.com/project/_/editor).
 
@@ -71,12 +67,21 @@ For the following steps, make sure you have the ["Test Mode" toggle](https://str
 
 We need to create a webhook in the `Developers` section of Stripe. Pictured in the architecture diagram above, this webhook is the piece that connects Stripe to your Vercel Serverless Functions.
 
-1. Click the "Add Endpoint" button on the [test Endpoints page](https://dashboard.stripe.com/test/webhooks).
-1. Enter your production deployment URL followed by `/api/webhooks` for the endpoint URL. (e.g. `https://your-deployment-url.vercel.app/api/webhooks`)
-1. Click `Select events` under the `Select events to listen to` heading.
-1. Click `Select all events` in the `Select events to send` section.
-1. Copy `Signing secret` as we'll need that in the next step (e.g `whsec_xxx`) (/!\ be careful not to copy the webook id we_xxxx).
-1. In addition to the `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` and the `STRIPE_SECRET_KEY` we've set earlier during deployment, we need to add the webhook secret as `STRIPE_WEBHOOK_SECRET` env var.
+1. Click the "Add Endpoint" (or "Create an event destination") button on the [test Endpoints page](https://dashboard.stripe.com/test/webhooks).
+2. **Important:** When selecting events, you may see a notice about "Snapshot payloads" vs "Thin payloads". This template uses **snapshot payloads** (the traditional format). Only select events that use snapshot payloads, or if given the option, skip creating a destination for thin payloads.
+3. Select the following event types (these all use snapshot payloads):
+   - `customer.*`
+   - `product.*`
+   - `price.*`
+   - `checkout.session.*`
+   - `invoice.*`
+   - `subscription.*`
+   
+   Alternatively, you can select "All events" but be aware you may need to create separate destinations for different payload styles.
+4. Click "Continue" and select "Webhook endpoint" as the destination type.
+5. Enter your production deployment URL followed by `/api/webhooks` for the endpoint URL. (e.g. `https://your-deployment-url.vercel.app/api/webhooks`)
+6. Copy the `Signing secret` as we'll need that in the next step (e.g `whsec_xxx`) (/!\ be careful not to copy the webhook id `we_xxxx`).
+7. In addition to the `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` and the `STRIPE_SECRET_KEY` we've set earlier during deployment, we need to add the webhook secret as `STRIPE_WEBHOOK_SECRET` env var.
 
 #### Redeploy with new env vars
 
@@ -148,7 +153,13 @@ Running this command will create a new `.env.local` file in your project folder.
 
 It's highly recommended to use a local Supabase instance for development and testing. We have provided a set of custom commands for this in `package.json`.
 
-First, you will need to install [Docker](https://www.docker.com/get-started/). You should also copy or rename:
+First, you will need to install [Docker](https://www.docker.com/get-started/). You will also need to install the [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started):
+
+```bash
+brew install supabase/tap/supabase
+```
+
+Next, copy or rename:
 
 - `.env.local.example` -> `.env.local`
 - `.env.example` -> `.env`
